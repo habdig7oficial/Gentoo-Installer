@@ -84,7 +84,7 @@ module NCurses
 			else
 				set_color 1
 			end
-
+			
 			print "-> #{text}\n"
 		end
 	end
@@ -106,15 +106,36 @@ module NCurses
 		set_color 1
 		scrollok()
 
-		license = File.read("./COPYING.txt")
-
-		print license
-		refresh()
-
-		while true 
-			if get_char() == Key::Esc 
-				Process.restart()
+		license = File.read_lines("./COPYING.txt")
+		
+		i = 0
+		while true
+			j = 0
+			erase()
+			set_color 1
+			while j < height - 2
+				#if i + j >= 0 && j + i < license.size
+					print "#{license[j + i]}\n"
+				#end
+				j += 1
 			end
+			
+			set_color 3
+			print "Aperte <Esc> para sair\n"
+			#
+			refresh()
+			
+			key = get_char()
+			if key == Key::Esc
+				NCurses.end
+				Process.exit()
+			elsif key == Key::Up && i > 0 
+				i -= 1
+			elsif key == Key::Down && i <= license.size - height
+				i += 1 
+			end
+
+
 		end
 	end
 	refresh()
