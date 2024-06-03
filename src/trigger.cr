@@ -1,6 +1,8 @@
 require "ncurses"
 
+## Modulos para cada etapa 
 
+require "./steps/network"
 
 module NCurses
 	start()
@@ -39,6 +41,11 @@ module NCurses
 	## Ativa o Keypad 
 
 	keypad true
+
+	## Desativa o print do cursor na tela
+	set_cursor Cursor::Invisible
+	
+
 
 	## Leitor de Buffers Grandes
 
@@ -134,10 +141,8 @@ module NCurses
 	end
 
 
-	###
-
+	txt = Array(String).new
 	set_color 1 
-
 	print "Bem-Vindo ao Meu Instalador do Gentoo GNU/Linux\n\n"
 	set_color 3
 	print "Copyright © 2024 Mateus Felipe da Silveira Vieira\n\n" 
@@ -176,7 +181,7 @@ Este trabalho está disponível sob a licença GNU General Public License (GPL),
 
 	case opt
 	when 0 
-		print "comecando"
+		network()
 	when 1 
 		NCurses.end()
 		Process.exit()
