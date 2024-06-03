@@ -26,7 +26,8 @@ module NCurses
 		init_color_pair(1, Color::White, Color::Black)
 		init_color_pair(2, Color::Black, Color::White)
 		init_color_pair(3, Color::Cyan, Color::Black)
-		
+		init_color_pair(4, Color::Magenta, Color::Black)
+
 		unless can_change_color?()
 			print "Mudança de Cores não suportada!\n"
 			await_clear()
@@ -49,7 +50,7 @@ module NCurses
                         set_color 1
                         while j < height - 2 # 1 linha reservada pra mensagem
                                 
-                                print "#{text[j + i]} #{j + i}\n"
+                                print "#{text[j + i]}\n"
                                 j += 1
                         end
                         
@@ -82,11 +83,13 @@ module NCurses
 
 	## Menu de Selecionamento
 
-	def select_menu(text : String, options : Array(String), current_row : Int8 = 0_i8) : Int8
-
-        build_select_menu(text, options, current_row)
+	def select_menu(line : Int8, options : Array(String), current_row : Int8 = 0_i8) : Int8
+	
+		win = Window.new(height - line, width, line, 0)
+        
         while true
-                key = get_char()
+        	build_select_menu(win, options, current_row)
+		key = get_char()
 
                 if key == Key::Up && current_row > 0
                         current_row -= 1_i8
@@ -103,31 +106,31 @@ module NCurses
                         current_row = (options.size() - 1).to_i8 
                 elsif key == Key::Down && current_row == options.size - 1
                         current_row = 0_i8
-                end
-	
-                build_select_menu(text, options, current_row)
 
+		elsif key = Key::Resize 
+			refresh
+                end
         end
 
 	return current_row
 
 	end
-
-	def build_select_menu(text : String, options : Array(String), row_id : Int8)
-		erase()
-		set_color 0
-		print "#{text}\n\n"
+        
+	def build_select_menu(win : Window, options : Array(String), row_id : Int8)	
+		win.erase 
 
 		options.each_with_index do | text, i |
-			
+		
 			if i.to_i8 == row_id
-				set_color 2
+				win.set_color 2
 			else
-				set_color 1
+				win.set_color 1
 			end
 			
-			print "-> #{text}\n"
+			win.print "-> #{text}\n"		
 		end
+		win.refresh
+		
 	end
 
 
@@ -135,7 +138,41 @@ module NCurses
 
 	set_color 1 
 
-	opt = select_menu("Bem-Vindo", ["Instalar", "Sair", "Ver Licença"])
+	print "Bem-Vindo ao Meu Instalador do Gentoo GNU/Linux\n\n"
+	set_color 3
+	print "Copyright © 2024 Mateus Felipe da Silveira Vieira\n\n" 
+	set_color 1
+	print "Este Software é distribuido na licença GNU Affero General Public License (AGPL) versão 3 ou em qualquer versão posterior\n\n"
+	print("
+    _-`````-,           ,- '- .
+  .'   .- - |          | - -.  `.
+ /.'  /                     `.   \\
+:/   :      _...   ..._      ``   :
+::   :     /._ .`:'_.._\.    ||   :
+::    `._ ./  ,`  :    \ . _.''   .
+`:.      /   |  -.  \-. \\_      /
+  \:._ _/  .'   .@)  \@) ` `\ ,.'
+     _/,--'       .- .\,-.`--`.
+       ,'/''     (( \ `  )    
+        /'/'  \    `-'  (      
+         '/''  `._,-----'
+          ''/'    .,---'
+           ''/'      ;:
+             ''/''  ''/
+               ''/''/''
+                 '/'/'
+                  `;
+
+ASCII GNU art
+Copyright © 2003 Vijay Kumar
+(This work is available under the GNU General Public License, version 2 or any later version, or the GNU Free Documentation License, version 1.1 or any later version.)
+Este trabalho está disponível sob a licença GNU General Public License (GPL), versão 2 ou qualquer versão posterior ou na GNU Free Documentation License, versão 1.1 ou qualquer versão posterior
+       ")
+	set_color 4
+	print "\nFree as in Freedom!"
+	set_color 1
+	refresh
+	opt = select_menu((height - 4).to_i8, ["Instalar", "Sair", "Ver Licença"], 1_i8)
 
 	case opt
 	when 0 
