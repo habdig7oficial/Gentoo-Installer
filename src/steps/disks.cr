@@ -24,7 +24,7 @@ module NCurses
 			
 			if File.exists?(dev) && dev.match(/\/dev\/(.*)/) 
 				print "Dispositivo Flash Selecionado"
-			elsif Dir.exists(dev) && dev.match(/\/cdrom(.*)/) 
+			elsif Dir.exists?(dev) && dev.match(/\/cdrom(.*)/) 
 				print "Disco Selecionado"
 			else
 				print "O disco escolhido não existe"
