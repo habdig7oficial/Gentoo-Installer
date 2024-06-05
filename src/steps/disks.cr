@@ -3,8 +3,28 @@ require "ncurses"
 require "../utils/long_reader"
 require "../utils/menu"
 require "../utils/await_clear"
+require "../utils/unit_conversion.cr"
 
-module NCurses 
+module NCurses
+
+	def ram() : Int32
+		proc = File.read_lines("/proc/meminfo") 
+
+		value : (String | Nil) = ""
+		proc.each do | text |
+			if text.match(/MemTotal:(.*)/)
+				value = text.match(/[0-9]+/).try &.[0]
+				break
+			end
+		end
+		if value != nil || Int32 == value.to_s.to_i
+			return value.to_s.to_i
+		else
+			raise "No value found"
+			return 0 
+		end
+	end
+
 	def disks()
 
 		print "Etapa Atual: Preparando os discos\n\n"
@@ -37,7 +57,34 @@ module NCurses
 
 			stdout.clear
                         Process.run("parted", ["--script", dev, "-l"], output: stdout)
-                        long_reader("#{stdout.to_s}".split("\n"), console: true).strip
+
+			total_ram : Int32 = ram
+			default_ram : (Int32 | Nil)
+
+			if total_ram <= 2097152 ## 2 Gb
+				default_ram = 2 * total_ram
+			elsif total_ram > 2097152 && total_ram <= 8388608 ## 8 Gb
+				default_ram = total_ram
+			elsif total_ram > 8388608
+				default_ram = 8388608 
+			end
+			
+			if default_ram.nil?
+				0 
+			else 
+				default_ram
+			end
+
+			print stdout.to_s
+
+			print "Escolha o amazenamento utilizado para Swap\n\nO recomendado é "
+
+			print "#{kb_to_gb default_ram} Gb ou #{default_ram.to_s} Kb"
+
+			refresh
+			get_char
+
+                        #long_reader("#{stdout.to_s}".split("\n"), console: true).strip
 
 			
 			refresh
