@@ -11,6 +11,7 @@ require "./utils/await_clear"
 ## Modulos para cada etapa 
 
 require "./steps/network"
+require "./steps/disks"
 
 module NCurses
 	start()
@@ -21,11 +22,15 @@ module NCurses
 
 	keypad true
 
+	## Desativa o print do input
+
+	no_echo
+
 	## Desativa o print do cursor na tela
 	set_cursor Cursor::Invisible	
 
 
-	uid = LibC.getuid #Process.run("whoami", [], output: IO::Memory.new)
+	uid = LibC.getuid
 
 	if uid != 0 
 		print "Nível de Pemissão Atual (#{uid}) Insuficiênte. Por Favor rode o programa novamento como "
@@ -33,7 +38,7 @@ module NCurses
 		print "ROOT"
 		set_color 1
 		refresh 
-		await_clear()
+		select_menu(2, ["OK"],0)
 		NCurses.end
 		Process.exit()
 	end
@@ -78,6 +83,7 @@ Este trabalho está disponível sob a licença GNU General Public License (GPL),
 	case opt
 	when 0 
 		network()
+		disks()
 	when 1 
 		NCurses.end()
 		Process.exit()

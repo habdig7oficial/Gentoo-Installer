@@ -5,7 +5,9 @@ module NCurses
         def configure_colors
                 unless has_colors?()
                         print "Seu console não suporta cores\n"
-                        await_clear()           
+                        await_clear() 
+			NCurses.end
+			Process.exit()
                 end
 
                 start_color()
@@ -16,6 +18,7 @@ module NCurses
                 init_color_pair(3, Color::Cyan, Color::Black)
                 init_color_pair(4, Color::Magenta, Color::Black)
                 init_color_pair(5, Color::Red, Color::Black)
+		init_color_pair(6, Color::Green, Color::Black)	
 
                 unless can_change_color?()
                         print "Mudança de Cores não suportada!\n"
