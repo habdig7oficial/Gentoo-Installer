@@ -59,7 +59,7 @@ module NCurses
                         Process.run("parted", ["--script", dev, "-l"], output: stdout)
 
 			total_ram : Int32 = ram
-			default_ram : (Int32 | Nil)
+			default_ram : Int32
 
 			if total_ram <= 2097152 ## 2 Gb
 				default_ram = 2 * total_ram
@@ -67,27 +67,37 @@ module NCurses
 				default_ram = total_ram
 			elsif total_ram > 8388608
 				default_ram = 8388608 
-			end
-			
-			if default_ram.nil?
-				0 
 			else 
-				default_ram
+				default_ram = 0
+				raise "RAM não detectada"
+			end
+	
+
+			while true
+                        	choice = long_reader("#{stdout.to_s}Escolha o amazenamento utilizado para Swap\nO recomendado é #{kb_to_gb default_ram} Gb ou #{default_ram.to_s} Kb".split("\n"), console: true).strip
+
+				refresh
+
+				if choice.downcase == "sim"
+					print "ok"
+					erase()
+					break
+
+				else 
+					begin 
+						default_ram = choice.to_i
+						break
+					rescue
+						print "Digite o valor em Kb"
+						await_clear 2.seconds
+					end
+				end
+
 			end
 
-			print stdout.to_s
+			print "deixar o resto do disco para /" 
+			opt = select_menu(2, ["Sim", "Inserir manualmente"])
 
-			print "Escolha o amazenamento utilizado para Swap\n\nO recomendado é "
-
-			print "#{kb_to_gb default_ram} Gb ou #{default_ram.to_s} Kb"
-
-			refresh
-			get_char
-
-                        #long_reader("#{stdout.to_s}".split("\n"), console: true).strip
-
-			
-			refresh
 		when 1
 
 		end
