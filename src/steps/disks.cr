@@ -4,6 +4,7 @@ require "../utils/long_reader"
 require "../utils/menu"
 require "../utils/await_clear"
 require "../utils/unit_conversion.cr"
+require "../utils/loading_bar"
 
 module NCurses
 
@@ -78,9 +79,9 @@ module NCurses
 
 				refresh
 
-				if choice.downcase == "sim"
+				if choice.downcase.strip == "sim"
 					print "ok"
-					erase()
+					await_clear 0.seconds
 					break
 
 				else 
@@ -96,7 +97,20 @@ module NCurses
 			end
 
 			print "deixar o resto do disco para /" 
-			opt = select_menu(2, ["Sim", "Inserir manualmente"])
+			opt = select_menu(2, ["Sim", "Inserir manualmente"],0)
+			if opt == 1
+				## TODO 
+			end
+
+			
+			print "Insira o nome do formato de arquivo desejado\n\n"
+			config["target_fs"] = get_char.to_s
+
+			print "Inciar Instalação"
+
+			start = select_menu(2, ["Sim", "Retornar"])
+			
+			progress_print	
 
 		when 1
 
