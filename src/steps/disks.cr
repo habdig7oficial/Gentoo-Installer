@@ -103,14 +103,15 @@ module NCurses
 			end
 
 			
-			print "Insira o nome do formato de arquivo desejado\n\n"
-			config["target_fs"] = get_char.to_s
+		#	print "Insira o nome do formato de arquivo desejado\n\n"
+			#config["target_fs"] = get_char.to_s
+
 
 			print "Inciar Instalação"
 
 			start = select_menu(2, ["Sim", "Retornar"])
 			
-			progress_print	
+			progress_print 4
 
 		when 1
 
